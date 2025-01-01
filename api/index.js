@@ -1,0 +1,144 @@
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+import helmet from "helmet";
+import logger, { errorLogger } from "./middleware/logger.js";
+import ticketRoute from "./routes/ticket.route.js";
+import userRouter from "./routes/user.route.js";
+import authRouter from "./routes/auth.route.js";
+import productRouter from "./routes/product.route.js";
+import cartRouter from "./routes/cart.route.js";
+import orderRouter from "./routes/order.route.js";
+import adminRouter from "./routes/admin.route.js";
+import sellerRouter from "./routes/seller.route.js"; // ✅ NEW
+import upload from "./upload.js";
+import setupSwagger from './config/swagger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
+const app = express();
+
+// Add a root route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Gardenly API!');
+});
+
+// =======================
+// MIDDLEWARES
+// =======================
+app.use(helmet());
+app.use(logger);
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// =======================
+// STATIC FILES
+// =======================
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// =======================
+// ROUTES
+// =======================
+app.use("/api/tickets", ticketRoute);
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/orders", orderRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/seller", sellerRouter); // ✅ NEW SELLER DASHBOARD ROUTE
+
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Retrieve a list of users
+ *     description: Retrieve a list of all users in the system.
+ *     responses:
+ *       200:
+ *         description: A list of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     description: The user ID.
+ *                     example: 12345
+ *                   name:
+ *                     type: string
+ *                     description: The user's name.
+ *                     example: John Doe
+ */
+app.get('/users', (req, res) => {
+  res.send('List of users');
+});
+
+// =======================
+// ERROR HANDLING
+// =======================
+
+// 1. Structured logging of errors
+app.use(errorLogger);
+
+// 2. Final error response to client
+app.use((err, req, res, next) => {
+  console.error("Error middleware:", err);
+
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(statusCode).json({
+    success: false,
+    status: statusCode,
+    message,
+    ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
+  });
+});
+
+// =======================
+// DATABASE + SERVER START
+// =======================
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+  try {
+    // 🔥 CONNECT TO MONGODB FIRST
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "gardenly",
+    });
+
+    console.log("🟢 MongoDB connected successfully");
+
+    // THEN start server
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  }
+}
+setupSwagger(app);
+startServer();
+
+
+export { upload };
