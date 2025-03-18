@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gardenly Seller Dashboard</title>
+    <link rel="stylesheet" href="../public/styles/sellerdashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button id="mobile-menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">Gardenly</div>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+            </button>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Gardenly</div>
+                <button id="sidebar-close" class="sidebar-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-page="dashboard">
+                        <a href="#dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li data-page="products">
+                        <a href="#products"><i class="fas fa-box"></i> Products</a>
+                    </li>
+                    <li data-page="orders">
+                        <a href="#orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li data-page="analytics">
+                        <a href="#analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
+                    </li>
+                    <li data-page="settings">
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="metric-cards">
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Total Revenue</h3>
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="metric-value">$45,231.89</div>
+                            <div class="metric-change positive">+20.1% from last month</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>New Customers</h3>
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-value">+2,350</div>
+                            <div class="metric-change positive">+180.1% from last month</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Sales</h3>
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="metric-value">+12,234</div>
+                            <div class="metric-change positive">+19% from last month</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Active Products</h3>
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="metric-value">573</div>
+                            <div class="metric-change positive">+201 since last week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="dashboard-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Revenue Overview</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Sales by Category</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="category-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Page -->
+            <section id="products-page" class="page">
+                <div class="page-header">
+                    <h1>Products</h1>
+                    <div class="header-actions">
+                        <button id="add-product-btn" class="btn primary-btn">
+                            <i class="fas fa-plus-circle"></i> Add Product
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Product Inventory</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table id="products-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Monstera Deliciosa</td>
+                                        <td>Plants</td>
+                                        <td>$49.99</td>
+                                        <td>25</td>
+                                        <td><span class="status in-stock">In Stock</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gardening Gloves</td>
+                                        <td>Tools</td>
+                                        <td>$12.99</td>
+                                        <td>50</td>
+                                        <td><span class="status in-stock">In Stock</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tomato Seeds</td>
+                                        <td>Seeds</td>
+                                        <td>$4.99</td>
+                                        <td>100</td>
+                                        <td><span class="status in-stock">In Stock</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fiddle Leaf Fig</td>
+                                        <td>Plants</td>
+                                        <td>$79.99</td>
+                                        <td>5</td>
+                                        <td><span class="status low-stock">Low Stock</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pruning Shears</td>
+                                        <td>Tools</td>
+                                        <td>$24.99</td>
+                                        <td>0</td>
+                                        <td><span class="status out-of-stock">Out of Stock</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Page -->
+            <section id="orders-page" class="page">
+                <div class="page-header">
+                    <h1>Orders</h1>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Order Management</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table id="orders-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-001</td>
+                                        <td>Sri Harsha</td>
+                                        <td>2023-06-15</td>
+                                        <td>$129.97</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-002</td>
+                                        <td>Pardhuva</td>
+                                        <td>2023-06-14</td>
+                                        <td>$54.98</td>
+                                        <td><span class="status shipped">Shipped</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-003</td>
+                                        <td>Abhyass</td>
+                                        <td>2023-06-14</td>
+                                        <td>$79.99</td>
+                                        <td><span class="status processing">Processing</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-004</td>
+                                        <td>Sai Teja</td>
+                                        <td>2023-06-13</td>
+                                        <td>$37.97</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-005</td>
+                                        <td>Satish</td>
+                                        <td>2023-06-12</td>
+                                        <td>$149.95</td>
+                                        <td><span class="status cancelled">Cancelled</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Page -->
+            <section id="analytics-page" class="page">
+                <div class="page-header">
+                    <h1>Analytics</h1>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Sales Trends</h2>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="sales-trends-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Page -->
+            <section id="settings-page" class="page">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Account Settings</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" value="gardenly_seller" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" value="seller@gardenly.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Theme</label>
+                                <div class="theme-selector">
+                                    <button type="button" id="theme-selector-btn" class="btn">
+                                        <i class="fas fa-moon"></i> Dark Mode
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn primary-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+
+    <script src="../public/scripts/sellerdashboard.js"></script>
+</body>
+</html>
+

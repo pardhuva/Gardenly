@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gardenly Delivery Manager</title>
+    <link rel="stylesheet" href="../public/styles/admindashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button id="mobile-menu-toggle" class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">Gardenly</div>
+            <button id="theme-toggle" class="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <i class="fas fa-sun"></i>
+            </button>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Gardenly</div>
+                <button id="sidebar-close" class="sidebar-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-page="dashboard">
+                        <a href="#dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li data-page="orders">
+                        <a href="#orders"><i class="fas fa-shipping-fast"></i> Orders</a>
+                    </li>
+                    <li data-page="agents">
+                        <a href="#agents"><i class="fas fa-users"></i> Delivery Agents</a>
+                    </li>
+                    <li data-page="routes">
+                        <a href="#routes"><i class="fas fa-route"></i> Routes</a>
+                    </li>
+                    <li data-page="analytics">
+                        <a href="#analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
+                    </li>
+                    <li data-page="settings">
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h1>Delivery Manager Dashboard</h1>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="metric-cards">
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Pending Deliveries</h3>
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-value">24</div>
+                            <div class="metric-change positive">-15% from yesterday</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>In Transit</h3>
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="metric-value">18</div>
+                            <div class="metric-change positive">+12% from yesterday</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Delivered Today</h3>
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="metric-value">32</div>
+                            <div class="metric-change positive">+28% from yesterday</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Active Agents</h3>
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="metric-value">8</div>
+                            <div class="metric-change">Same as yesterday</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="dashboard-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Delivery Performance</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="delivery-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Delivery Status</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="status-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Orders</h2>
+                        <a href="#orders" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Address</th>
+                                        <th>Delivery Agent</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-001</td>
+                                        <td>sri harsha</td>
+                                        <td>123 Garden St, Greenville</td>
+                                        <td>Alex Johnson</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-002</td>
+                                        <td>pardhuva</td>
+                                        <td>456 Plant Ave, Bloomfield</td>
+                                        <td>Michael Brown</td>
+                                        <td><span class="status in-transit">In Transit</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-003</td>
+                                        <td>abhyas</td>
+                                        <td>789 Flower Ln, Roseville</td>
+                                        <td>Unassigned</td>
+                                        <td><span class="status pending">Pending</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-004</td>
+                                        <td>sai teja</td>
+                                        <td>321 Tree Rd, Oakville</td>
+                                        <td>Sarah Wilson</td>
+                                        <td><span class="status in-transit">In Transit</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-005</td>
+                                        <td>satish</td>
+                                        <td>654 Shrub Ct, Ferndale</td>
+                                        <td>James Taylor</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Page -->
+            <section id="orders-page" class="page">
+                <div class="page-header">
+                    <h1>Manage Orders</h1>
+                    <div class="header-actions">
+                        <div class="search-container">
+                            <input type="text" placeholder="Search orders..." class="search-input">
+                            <button class="search-btn"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="filter-container">
+                            <select id="status-filter" class="filter-select">
+                                <option value="all">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="in-transit">In Transit</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>All Orders</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table id="orders-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Address</th>
+                                        <th>Order Date</th>
+                                        <th>Delivery Agent</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#ORD-001</td>
+                                        <td>John Smith</td>
+                                        <td>123 Garden St, Greenville</td>
+                                        <td>2023-06-15</td>
+                                        <td>Alex Johnson</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-002</td>
+                                        <td>sri harsha</td>
+                                        <td>456 Plant Ave, Bloomfield</td>
+                                        <td>2023-06-14</td>
+                                        <td>Michael Brown</td>
+                                        <td><span class="status in-transit">In Transit</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-003</td>
+                                        <td>pardhuva</td>
+                                        <td>789 Flower Ln, Roseville</td>
+                                        <td>2023-06-14</td>
+                                        <td>
+                                            <select class="agent-select">
+                                                <option value="">Assign Agent</option>
+                                                <option value="1">Alex Johnson</option>
+                                                <option value="2">Michael Brown</option>
+                                                <option value="3">Sarah Wilson</option>
+                                                <option value="4">James Taylor</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="status pending">Pending</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-004</td>
+                                        <td>abhyas</td>
+                                        <td>321 Tree Rd, Oakville</td>
+                                        <td>2023-06-13</td>
+                                        <td>Sarah Wilson</td>
+                                        <td><span class="status in-transit">In Transit</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-005</td>
+                                        <td>sai teja</td>
+                                        <td>654 Shrub Ct, Ferndale</td>
+                                        <td>2023-06-12</td>
+                                        <td>James Taylor</td>
+                                        <td><span class="status delivered">Delivered</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-006</td>
+                                        <td>satish</td>
+                                        <td>987 Grass St, Meadowville</td>
+                                        <td>2023-06-12</td>
+                                        <td>
+                                            <select class="agent-select">
+                                                <option value="">Assign Agent</option>
+                                                <option value="1">Alex Johnson</option>
+                                                <option value="2">Michael Brown</option>
+                                                <option value="3">Sarah Wilson</option>
+                                                <option value="4">James Taylor</option>
+                                            </select>
+                                        </td>
+                                        <td><span class="status pending">Pending</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-007</td>
+                                        <td>Robert Miller</td>
+                                        <td>753 Herb Ln, Spicetown</td>
+                                        <td>2023-06-11</td>
+                                        <td>Alex Johnson</td>
+                                        <td><span class="status processing">Processing</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#ORD-008</td>
+                                        <td>Lisa Anderson</td>
+                                        <td>159 Vine Rd, Grapeville</td>
+                                        <td>2023-06-11</td>
+                                        <td>Michael Brown</td>
+                                        <td><span class="status cancelled">Cancelled</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agents Page -->
+            <section id="agents-page" class="page">
+                <div class="page-header">
+                    <h1>Delivery Agents</h1>
+                    <div class="header-actions">
+                        <button id="add-agent-btn" class="btn primary-btn">
+                            <i class="fas fa-plus-circle"></i> Add Agent
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Agent Management</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table id="agents-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Agent ID</th>
+                                        <th>Name</th>
+                                        <th>Contact</th>
+                                        <th>Area</th>
+                                        <th>Current Load</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#AGT-001</td>
+                                        <td>Alex Johnson</td>
+                                        <td>alex@gardenly.com</td>
+                                        <td>North Zone</td>
+                                        <td>3 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-002</td>
+                                        <td>Michael Brown</td>
+                                        <td>michael@gardenly.com</td>
+                                        <td>South Zone</td>
+                                        <td>5 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-003</td>
+                                        <td>Sarah Wilson</td>
+                                        <td>sarah@gardenly.com</td>
+                                        <td>East Zone</td>
+                                        <td>2 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-004</td>
+                                        <td>James Taylor</td>
+                                        <td>james@gardenly.com</td>
+                                        <td>West Zone</td>
+                                        <td>4 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-005</td>
+                                        <td>Emily Parker</td>
+                                        <td>emily@gardenly.com</td>
+                                        <td>Central Zone</td>
+                                        <td>0 deliveries</td>
+                                        <td><span class="status inactive">Inactive</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-006</td>
+                                        <td>Daniel Lewis</td>
+                                        <td>daniel@gardenly.com</td>
+                                        <td>North Zone</td>
+                                        <td>1 delivery</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-007</td>
+                                        <td>Olivia Martinez</td>
+                                        <td>olivia@gardenly.com</td>
+                                        <td>South Zone</td>
+                                        <td>2 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#AGT-008</td>
+                                        <td>William Clark</td>
+                                        <td>william@gardenly.com</td>
+                                        <td>East Zone</td>
+                                        <td>3 deliveries</td>
+                                        <td><span class="status active">Active</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Routes Page -->
+            <section id="routes-page" class="page">
+                <div class="page-header">
+                    <h1>Delivery Routes</h1>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Route Planning</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="route-map-container">
+                            <div class="route-map">
+                                <!-- Map placeholder -->
+                                <div class="map-placeholder">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <p>Interactive map will be displayed here</p>
+                                </div>
+                            </div>
+                            <div class="route-sidebar">
+                                <div class="route-filters">
+                                    <h3>Filter Routes</h3>
+                                    <div class="form-group">
+                                        <label for="agent-filter">Delivery Agent</label>
+                                        <select id="agent-filter" class="filter-select">
+                                            <option value="all">All Agents</option>
+                                            <option value="1">Alex Johnson</option>
+                                            <option value="2">Michael Brown</option>
+                                            <option value="3">Sarah Wilson</option>
+                                            <option value="4">James Taylor</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="date-filter">Delivery Date</label>
+                                        <input type="date" id="date-filter" class="filter-input" value="2023-06-15">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="zone-filter">Zone</label>
+                                        <select id="zone-filter" class="filter-select">
+                                            <option value="all">All Zones</option>
+                                            <option value="north">North Zone</option>
+                                            <option value="south">South Zone</option>
+                                            <option value="east">East Zone</option>
+                                            <option value="west">West Zone</option>
+                                            <option value="central">Central Zone</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn primary-btn">Apply Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Scheduled Routes</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Route ID</th>
+                                        <th>Agent</th>
+                                        <th>Date</th>
+                                        <th>Zone</th>
+                                        <th>Orders</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#RTE-001</td>
+                                        <td>Alex Johnson</td>
+                                        <td>2023-06-15</td>
+                                        <td>North Zone</td>
+                                        <td>3 orders</td>
+                                        <td><span class="status in-progress">In Progress</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#RTE-002</td>
+                                        <td>Michael Brown</td>
+                                        <td>2023-06-15</td>
+                                        <td>South Zone</td>
+                                        <td>5 orders</td>
+                                        <td><span class="status in-progress">In Progress</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#RTE-003</td>
+                                        <td>Sarah Wilson</td>
+                                        <td>2023-06-15</td>
+                                        <td>East Zone</td>
+                                        <td>2 orders</td>
+                                        <td><span class="status in-progress">In Progress</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#RTE-004</td>
+                                        <td>James Taylor</td>
+                                        <td>2023-06-15</td>
+                                        <td>West Zone</td>
+                                        <td>4 orders</td>
+                                        <td><span class="status in-progress">In Progress</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#RTE-005</td>
+                                        <td>Daniel Lewis</td>
+                                        <td>2023-06-16</td>
+                                        <td>North Zone</td>
+                                        <td>3 orders</td>
+                                        <td><span class="status scheduled">Scheduled</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
+                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Page -->
+            <section id="analytics-page" class="page">
+                <div class="page-header">
+                    <h1>Delivery Analytics</h1>
+                </div>
+                
+                <div class="metric-cards">
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Average Delivery Time</h3>
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-value">45 min</div>
+                            <div class="metric-change positive">-12% from last week</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>On-Time Delivery Rate</h3>
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="metric-value">94%</div>
+                            <div class="metric-change positive">+3% from last week</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Customer Satisfaction</h3>
+                                <i class="fas fa-smile"></i>
+                            </div>
+                            <div class="metric-value">4.8/5</div>
+                            <div class="metric-change positive">+0.2 from last week</div>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-content">
+                            <div class="metric-header">
+                                <h3>Delivery Issues</h3>
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="metric-value">3%</div>
+                            <div class="metric-change positive">-1% from last week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Weekly Delivery Performance</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="weekly-performance-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h2>Delivery Time by Zone</h2>
+                        </div>
+                        <div class="card-content">
+                            <canvas id="zone-performance-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Agent Performance</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>Deliveries Completed</th>
+                                        <th>Avg. Delivery Time</th>
+                                        <th>On-Time Rate</th>
+                                        <th>Customer Rating</th>
+                                        <th>Issues</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Alex Johnson</td>
+                                        <td>42</td>
+                                        <td>38 min</td>
+                                        <td>96%</td>
+                                        <td>4.9/5</td>
+                                        <td>1%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Michael Brown</td>
+                                        <td>38</td>
+                                        <td>42 min</td>
+                                        <td>94%</td>
+                                        <td>4.7/5</td>
+                                        <td>3%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sarah Wilson</td>
+                                        <td>35</td>
+                                        <td>40 min</td>
+                                        <td>97%</td>
+                                        <td>4.8/5</td>
+                                        <td>2%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>James Taylor</td>
+                                        <td>45</td>
+                                        <td>36 min</td>
+                                        <td>98%</td>
+                                        <td>4.9/5</td>
+                                        <td>1%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Page -->
+            <section id="settings-page" class="page">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Delivery Settings</h2>
+                    </div>
+                    <div class="card-content">
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="delivery-radius">Maximum Delivery Radius (km)</label>
+                                <input type="number" id="delivery-radius" value="15" min="1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="delivery-fee">Standard Delivery Fee ($)</label>
+                                <input type="number" id="delivery-fee" value="5.99" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="free-threshold">Free Delivery Threshold ($)</label>
+                                <input type="number" id="free-threshold" value="50" step="1" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="delivery-slots">Daily Delivery Slots</label>
+                                <input type="number" id="delivery-slots" value="8" min="1" max="24">
+                            </div>
+                            <div class="form-group">
+                                <label>Theme</label>
+                                <div class="theme-selector">
+                                    <button type="button" id="theme-selector-btn" class="btn">
+                                        <i class="fas fa-moon"></i> Dark Mode
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn primary-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+
+    <script src="../public/scripts/admindashboard.js"></script>
+</body>
+</html>
