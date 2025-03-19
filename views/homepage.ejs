@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
     <link href="../public/styles/homestyle.css" rel="stylesheet">
-    
+    <link href="../public/styles/searchhandler.css" rel="stylesheet">
 </head>
 <body>
     <!-- Include Header -->
@@ -114,7 +114,116 @@
     <!-- jQuery & Swiper JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+    <script>
+        // Product data
+        window.newProducts = [
+            {
+                id: 1,
+                name: "Money Plant Golden",
+                image: "./public/images/new-products/p6.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "A beautiful low-maintenance plant that brings prosperity.",
+                inStock: true
+            },
+            {
+                id: 2,
+                name: "Growing round Plastic pot",
+                image: "./public/images/new-products/p7.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Durable plastic pot perfect for small plants.",
+                inStock: true
+            },
+            {
+                id: 3,
+                name: "Spinach Seeds",
+                image: "./public/images/new-products/p5.jpg",
+                rating: 4.5,
+                price: 5,
+                originalPrice: 7.60,
+                description: "High-quality seeds for growing fresh spinach.",
+                inStock: true
+            },
+            {
+                id: 4,
+                name: "Pruning Secateur",
+                image: "./public/images/new-products/p1.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Sharp tool for precise plant pruning.",
+                inStock: false
+            },
+            {
+                id: 5,
+                name: "Onex Pebbles - 1Kg",
+                image: "./public/images/new-products/p3.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Decorative pebbles for garden aesthetics.",
+                inStock: true
+            },
+            {
+                id: 6,
+                name: "Parijat Tree",
+                image: "./public/images/new-products/p4.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Fragrant flowering tree for your garden.",
+                inStock: true
+            },
+            {
+                id: 7,
+                name: "Fungo Gaurd - 500ml",
+                image: "./public/images/new-products/p2.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Fungicide to protect plants from fungal diseases.",
+                inStock: true
+            },
+            {
+                id: 8,
+                name: "Coco Husk Block - 5kg",
+                image: "./public/images/new-products/p8.jpg",
+                rating: 4.5,
+                price: 10,
+                originalPrice: 14.50,
+                description: "Natural growing medium for healthy plants.",
+                inStock: true
+            }
+        ];
+
+        window.bestProducts = [
+            {
+                id: 1,
+                name: "Bonsai",
+                image: "public/images/best-products/s1.jpg"
+            },
+            {
+                id: 2,
+                name: "Indoor",
+                image: "public/images/best-products/s2.jpg"
+            },
+            {
+                id: 3,
+                name: "Areca Palm",
+                image: "public/images/best-products/s3.jpg"
+            },
+            {
+                id: 4,
+                name: "Seeds",
+                image: "public/images/best-products/s4.jpg"
+            }
+        ];
+    </script>
     <script src="../public/scripts/homescript.js" defer></script>
+    <script src="../public/scripts/searchhandler.js" defer></script>
 </body>
 <footer>
     <%- include('partials/footer.ejs') %>

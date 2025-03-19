@@ -1,393 +1,398 @@
-import { Chart } from "@/components/ui/chart"
-document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements
-  const themeToggle = document.getElementById("theme-toggle")
-  const themeSelectorBtn = document.getElementById("theme-selector-btn")
-  const mobileMenuToggle = document.getElementById("mobile-menu-toggle")
-  const sidebarClose = document.getElementById("sidebar-close")
-  const sidebar = document.querySelector(".sidebar")
-  const overlay = document.getElementById("overlay")
-  const navItems = document.querySelectorAll(".sidebar-nav li")
-  const pages = document.querySelectorAll(".page")
-  const addAgentBtn = document.getElementById("add-agent-btn")
-  const settingsForm = document.getElementById("settings-form")
-  const statusFilter = document.getElementById("status-filter")
-  const agentSelects = document.querySelectorAll(".agent-select")
+// Theme Management
+const themeToggle = document.getElementById('theme-toggle');
+const themeSelectorBtn = document.getElementById('theme-selector-btn');
 
-  // Check for saved theme preference
-  const savedTheme = localStorage.getItem("theme")
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark-mode")
-    updateThemeButtonText()
-  }
+// Load saved theme preference
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+updateThemeButton(savedTheme);
 
-  // Initialize Charts
-  initCharts()
+themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeButton(newTheme);
+});
 
-  // Toggle Theme
-  function toggleTheme() {
-    document.body.classList.toggle("dark-mode")
-    updateThemeButtonText()
-
-    // Save theme preference
-    const isDarkMode = document.body.classList.contains("dark-mode")
-    localStorage.setItem("theme", isDarkMode ? "dark" : "light")
-
-    // Reinitialize charts with new theme colors
-    setTimeout(initCharts, 100)
-  }
-
-  function updateThemeButtonText() {
-    const isDarkMode = document.body.classList.contains("dark-mode")
-    if (themeSelectorBtn) {
-      themeSelectorBtn.innerHTML = isDarkMode
-        ? '<i class="fas fa-sun"></i> Light Mode'
-        : '<i class="fas fa-moon"></i> Dark Mode'
+function updateThemeButton(theme) {
+    const sunIcon = themeToggle.querySelector('.fa-sun');
+    const moonIcon = themeToggle.querySelector('.fa-moon');
+    if (theme === 'dark') {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+    } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
     }
-  }
+}
 
-  if (themeToggle) themeToggle.addEventListener("click", toggleTheme)
-  if (themeSelectorBtn) themeSelectorBtn.addEventListener("click", toggleTheme)
+// Mobile Menu Management
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+const sidebarClose = document.getElementById('sidebar-close');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.getElementById('overlay');
 
-  // Mobile Menu Toggle
-  if (mobileMenuToggle) {
-    mobileMenuToggle.addEventListener("click", () => {
-      sidebar.classList.add("active")
-      overlay.style.display = "block"
-    })
-  }
+function toggleSidebar() {
+    sidebar.classList.toggle('active');
+    overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+}
 
-  if (sidebarClose) {
-    sidebarClose.addEventListener("click", () => {
-      sidebar.classList.remove("active")
-      overlay.style.display = "none"
-    })
-  }
+mobileMenuToggle.addEventListener('click', toggleSidebar);
+sidebarClose.addEventListener('click', toggleSidebar);
+overlay.addEventListener('click', toggleSidebar);
 
-  if (overlay) {
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("active")
-      overlay.style.display = "none"
-    })
-  }
+// Navigation
+document.querySelectorAll('.sidebar-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const page = link.parentElement.dataset.page;
+        navigateToPage(page);
+    });
+});
 
-  // Navigation
-  navItems.forEach((item) => {
-    item.addEventListener("click", function (e) {
-      const link = this.querySelector("a")
-      if (link && link.getAttribute("href").startsWith("#")) {
-        e.preventDefault()
+function navigateToPage(page) {
+    // Update active state in sidebar
+    document.querySelectorAll('.sidebar-nav li').forEach(li => {
+        li.classList.toggle('active', li.dataset.page === page);
+    });
 
-        // Update active nav item
-        navItems.forEach((navItem) => navItem.classList.remove("active"))
-        this.classList.add("active")
+    // Show selected page
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.toggle('active', p.id === `${page}-page`);
+    });
 
-        // Show corresponding page
-        const pageId = this.getAttribute("data-page") + "-page"
-        pages.forEach((page) => page.classList.remove("active"))
-        document.getElementById(pageId).classList.add("active")
+    // Close mobile menu if open
+    if (window.innerWidth <= 1024) {
+        toggleSidebar();
+    }
 
-        // Close sidebar on mobile
-        if (window.innerWidth <= 768) {
-          sidebar.classList.remove("active")
-          overlay.style.display = "none"
+    // Load page-specific data
+    loadPageData(page);
+}
+
+// Page Data Loading
+async function loadPageData(page) {
+    try {
+        switch (page) {
+            case 'dashboard':
+                await loadDashboardData();
+                break;
+            case 'orders':
+                await loadOrdersData();
+                break;
+            case 'agents':
+                await loadAgentsData();
+                break;
+            case 'routes':
+                await loadRoutesData();
+                break;
+            case 'analytics':
+                await loadAnalyticsData();
+                break;
+            case 'settings':
+                await loadSettingsData();
+                break;
         }
-      }
-    })
-  })
+    } catch (error) {
+        console.error(`Error loading ${page} data:`, error);
+        showError(`Failed to load ${page} data`);
+    }
+}
 
-  // Add Agent Button
-  if (addAgentBtn) {
-    addAgentBtn.addEventListener("click", () => {
-      alert("Add Agent functionality will be implemented here.")
-    })
-  }
+// Dashboard Data
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/dashboard/metrics');
+        const data = await response.json();
+        updateDashboardMetrics(data);
+        initializeCharts(data);
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
 
-  // Settings Form
-  if (settingsForm) {
-    settingsForm.addEventListener("submit", function (e) {
-      e.preventDefault()
-
-      // Collect form data
-      const formData = new FormData(this)
-      const data = {}
-      for (const [key, value] of formData.entries()) {
-        data[key] = value
-      }
-
-      // Here you would typically send the data to your server
-      console.log("Settings data:", data)
-
-      alert("Settings saved successfully!")
-    })
-  }
-
-  // Status Filter
-  if (statusFilter) {
-    statusFilter.addEventListener("change", function () {
-      const value = this.value.toLowerCase()
-      const rows = document.querySelectorAll("#orders-table tbody tr")
-
-      rows.forEach((row) => {
-        const statusCell = row.querySelector("td:nth-child(6) span")
-        if (!statusCell) return
-
-        const statusText = statusCell.textContent.trim().toLowerCase()
-
-        if (value === "all" || statusText.includes(value)) {
-          row.style.display = ""
-        } else {
-          row.style.display = "none"
+function updateDashboardMetrics(data) {
+    // Update metric cards
+    Object.entries(data.metrics).forEach(([key, value]) => {
+        const element = document.querySelector(`[data-metric="${key}"]`);
+        if (element) {
+            element.textContent = value;
         }
-      })
-    })
-  }
+    });
+}
 
-  // Agent Assignment
-  agentSelects.forEach((select) => {
-    select.addEventListener("change", function () {
-      if (this.value) {
-        const agentName = this.options[this.selectedIndex].text
-        const row = this.closest("tr")
-        const statusCell = row.querySelector("td:nth-child(6) span")
-
-        // Update the cell with the selected agent
-        this.parentNode.innerHTML = agentName
-
-        // Update status from "Pending" to "Processing"
-        if (statusCell && statusCell.classList.contains("pending")) {
-          statusCell.classList.remove("pending")
-          statusCell.classList.add("processing")
-          statusCell.textContent = "Processing"
-        }
-
-        // Here you would typically send the data to your server
-        const orderId = row.querySelector("td:nth-child(1)").textContent
-        console.log("Order assigned:", { orderId, agentId: this.value, agentName })
-
-        alert(`Order assigned to ${agentName} successfully!`)
-      }
-    })
-  })
-
-  // Initialize Charts
-  function initCharts() {
-    // Get colors from CSS variables
-    const primaryColor = "#22c55e"
-    const secondaryColor = "#3b82f6"
-    const tertiaryColor = "#f59e0b"
-    const quaternaryColor = "#8b5cf6"
-    const borderColor = getComputedStyle(document.documentElement).getPropertyValue("--border")
-    const textColor = getComputedStyle(document.documentElement).getPropertyValue("--foreground")
-    const mutedTextColor = getComputedStyle(document.documentElement).getPropertyValue("--muted-foreground")
-
+function initializeCharts(data) {
     // Delivery Performance Chart
-    const deliveryCtx = document.getElementById("delivery-chart")
-    if (deliveryCtx) {
-      // Destroy existing chart if it exists
-      const existingChart = Chart.getChart(deliveryCtx)
-      if (existingChart) {
-        existingChart.destroy()
-      }
-
-      new Chart(deliveryCtx, {
-        type: "line",
+    const deliveryCtx = document.getElementById('delivery-chart').getContext('2d');
+    new Chart(deliveryCtx, {
+        type: 'line',
         data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [
-            {
-              label: "Deliveries",
-              data: [12, 19, 15, 17, 22, 18, 15],
-              borderColor: primaryColor,
-              tension: 0.3,
-              fill: false,
-            },
-          ],
+            labels: data.charts.deliveryPerformance.labels,
+            datasets: [{
+                label: 'Deliveries',
+                data: data.charts.deliveryPerformance.data,
+                borderColor: '#4CAF50',
+                tension: 0.4
+            }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-            x: {
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-          },
-          plugins: {
-            legend: {
-              labels: { color: textColor },
-            },
-          },
-        },
-      })
-    }
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 
     // Delivery Status Chart
-    const statusCtx = document.getElementById("status-chart")
-    if (statusCtx) {
-      // Destroy existing chart if it exists
-      const existingChart = Chart.getChart(statusCtx)
-      if (existingChart) {
-        existingChart.destroy()
-      }
-
-      new Chart(statusCtx, {
-        type: "doughnut",
+    const statusCtx = document.getElementById('status-chart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
         data: {
-          labels: ["Pending", "Processing", "In Transit", "Delivered", "Cancelled"],
-          datasets: [
-            {
-              data: [15, 10, 18, 32, 5],
-              backgroundColor: [tertiaryColor, secondaryColor, quaternaryColor, primaryColor, "#ef4444"],
-            },
-          ],
+            labels: data.charts.deliveryStatus.labels,
+            datasets: [{
+                data: data.charts.deliveryStatus.data,
+                backgroundColor: [
+                    '#FFC107', // Pending
+                    '#2196F3', // Processing
+                    '#4CAF50', // In Transit
+                    '#66BB6A', // Delivered
+                    '#F44336'  // Cancelled
+                ]
+            }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { color: textColor },
-            },
-          },
-        },
-      })
-    }
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
 
+// Orders Management
+async function loadOrdersData() {
+    try {
+        const response = await fetch('/api/orders');
+        const data = await response.json();
+        updateOrdersTable(data);
+    } catch (error) {
+        console.error('Error loading orders:', error);
+    }
+}
+
+function updateOrdersTable(orders) {
+    const tbody = document.querySelector('#orders-table tbody');
+    tbody.innerHTML = orders.map(order => `
+        <tr>
+            <td>${order.id}</td>
+            <td>${order.customer}</td>
+            <td>${order.address}</td>
+            <td>${order.date}</td>
+            <td>${order.agent || 'Unassigned'}</td>
+            <td><span class="status ${order.statusClass}">${order.status}</span></td>
+            <td>
+                <button class="action-btn" onclick="viewOrder(${order.id})"><i class="fas fa-eye"></i></button>
+                <button class="action-btn" onclick="editOrder(${order.id})"><i class="fas fa-edit"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Agent Management
+async function loadAgentsData() {
+    try {
+        const response = await fetch('/api/agents');
+        const data = await response.json();
+        updateAgentsTable(data);
+    } catch (error) {
+        console.error('Error loading agents:', error);
+    }
+}
+
+function updateAgentsTable(agents) {
+    const tbody = document.querySelector('#agents-table tbody');
+    tbody.innerHTML = agents.map(agent => `
+        <tr>
+            <td>${agent.id}</td>
+            <td>${agent.name}</td>
+            <td>${agent.email}</td>
+            <td>${agent.area}</td>
+            <td>${agent.load}</td>
+            <td><span class="status ${agent.statusClass}">${agent.status}</span></td>
+            <td>
+                <button class="action-btn" onclick="viewAgent(${agent.id})"><i class="fas fa-eye"></i></button>
+                <button class="action-btn" onclick="editAgent(${agent.id})"><i class="fas fa-edit"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Route Planning
+async function loadRoutesData() {
+    try {
+        const response = await fetch('/api/routes');
+        const data = await response.json();
+        updateRoutesTable(data);
+        initializeMap(data);
+    } catch (error) {
+        console.error('Error loading routes:', error);
+    }
+}
+
+function updateRoutesTable(routes) {
+    const tbody = document.querySelector('#routes-table tbody');
+    tbody.innerHTML = routes.map(route => `
+        <tr>
+            <td>${route.id}</td>
+            <td>${route.agent}</td>
+            <td>${route.date}</td>
+            <td>${route.zone}</td>
+            <td>${route.orders}</td>
+            <td><span class="status ${route.statusClass}">${route.status}</span></td>
+            <td>
+                <button class="action-btn" onclick="viewRoute(${route.id})"><i class="fas fa-eye"></i></button>
+                <button class="action-btn" onclick="editRoute(${route.id})"><i class="fas fa-edit"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function initializeMap(routes) {
+    // Initialize Google Maps
+    const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 0, lng: 0 },
+        zoom: 12
+    });
+
+    // Add markers for each route
+    routes.forEach(route => {
+        new google.maps.Marker({
+            position: route.coordinates,
+            map: map,
+            title: `Route ${route.id}`
+        });
+    });
+}
+
+// Analytics
+async function loadAnalyticsData() {
+    try {
+        const response = await fetch('/api/analytics');
+        const data = await response.json();
+        updateAnalyticsMetrics(data);
+        initializeAnalyticsCharts(data);
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+    }
+}
+
+function updateAnalyticsMetrics(data) {
+    // Update analytics metric cards
+    Object.entries(data.metrics).forEach(([key, value]) => {
+        const element = document.querySelector(`[data-analytics-metric="${key}"]`);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+}
+
+function initializeAnalyticsCharts(data) {
     // Weekly Performance Chart
-    const weeklyCtx = document.getElementById("weekly-performance-chart")
-    if (weeklyCtx) {
-      // Destroy existing chart if it exists
-      const existingChart = Chart.getChart(weeklyCtx)
-      if (existingChart) {
-        existingChart.destroy()
-      }
-
-      new Chart(weeklyCtx, {
-        type: "bar",
+    const weeklyCtx = document.getElementById('weekly-performance-chart').getContext('2d');
+    new Chart(weeklyCtx, {
+        type: 'line',
         data: {
-          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
-          datasets: [
-            {
-              label: "On-Time Deliveries",
-              data: [65, 72, 78, 82],
-              backgroundColor: primaryColor,
-            },
-            {
-              label: "Delayed Deliveries",
-              data: [8, 6, 5, 3],
-              backgroundColor: tertiaryColor,
-            },
-          ],
+            labels: data.charts.weeklyPerformance.labels,
+            datasets: [{
+                label: 'Deliveries',
+                data: data.charts.weeklyPerformance.data,
+                borderColor: '#4CAF50',
+                tension: 0.4
+            }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-            x: {
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-          },
-          plugins: {
-            legend: {
-              labels: { color: textColor },
-            },
-          },
-        },
-      })
-    }
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 
     // Zone Performance Chart
-    const zoneCtx = document.getElementById("zone-performance-chart")
-    if (zoneCtx) {
-      // Destroy existing chart if it exists
-      const existingChart = Chart.getChart(zoneCtx)
-      if (existingChart) {
-        existingChart.destroy()
-      }
-
-      new Chart(zoneCtx, {
-        type: "bar",
+    const zoneCtx = document.getElementById('zone-performance-chart').getContext('2d');
+    new Chart(zoneCtx, {
+        type: 'bar',
         data: {
-          labels: ["North", "South", "East", "West", "Central"],
-          datasets: [
-            {
-              label: "Avg. Delivery Time (min)",
-              data: [38, 42, 40, 36, 45],
-              backgroundColor: secondaryColor,
-            },
-          ],
+            labels: data.charts.zonePerformance.labels,
+            datasets: [{
+                label: 'Average Delivery Time (min)',
+                data: data.charts.zonePerformance.data,
+                backgroundColor: '#4CAF50'
+            }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-            x: {
-              grid: { color: borderColor },
-              ticks: { color: mutedTextColor },
-            },
-          },
-          plugins: {
-            legend: {
-              labels: { color: textColor },
-            },
-          },
-        },
-      })
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Settings
+async function loadSettingsData() {
+    try {
+        const response = await fetch('/api/settings');
+        const data = await response.json();
+        updateSettingsForm(data);
+    } catch (error) {
+        console.error('Error loading settings:', error);
     }
-  }
+}
 
-  // Initialize Google Map
-  window.initMap = () => {
-    const defaultLocation = { lat: 40.7128, lng: -74.006 } // New York
-    const mapElement = document.getElementById("map")
+function updateSettingsForm(settings) {
+    const form = document.getElementById('settings-form');
+    Object.entries(settings).forEach(([key, value]) => {
+        const input = form.querySelector(`[name="${key}"]`);
+        if (input) {
+            input.value = value;
+        }
+    });
+}
 
-    if (mapElement) {
-      const map = new google.maps.Map(mapElement, {
-        zoom: 10,
-        center: defaultLocation,
-      })
+// Form Submission
+document.getElementById('settings-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const settings = Object.fromEntries(formData.entries());
 
-      new google.maps.Marker({
-        position: defaultLocation,
-        map: map,
-        title: "New York",
-      })
+    try {
+        const response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(settings)
+        });
+
+        if (response.ok) {
+            showSuccess('Settings updated successfully');
+        } else {
+            throw new Error('Failed to update settings');
+        }
+    } catch (error) {
+        console.error('Error updating settings:', error);
+        showError('Failed to update settings');
     }
-  }
+});
 
-  // Load Google Maps API
-  function loadGoogleMaps() {
-    if (document.getElementById("map")) {
-      const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap`
-      script.defer = true
-      script.async = true
-      window.google = window.google || {} // Ensure google is defined
-      document.head.appendChild(script)
-    }
-  }
+// Utility Functions
+function showSuccess(message) {
+    // Implement success notification
+    alert(message);
+}
 
-  // Check if map element exists before loading Google Maps
-  if (document.getElementById("map")) {
-    loadGoogleMaps()
-  }
-})
+function showError(message) {
+    // Implement error notification
+    alert(message);
+}
 
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    // Load initial page data
+    const currentPage = document.querySelector('.page.active')?.id.replace('-page', '') || 'dashboard';
+    loadPageData(currentPage);
+}); 

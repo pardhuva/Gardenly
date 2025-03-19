@@ -217,7 +217,7 @@ function showProductDetail(productId) {
             </div>
             <p class="price">$${product.price}</p>
             <p class="description">${product.description}</p>
-            <button ${!product.inStock ? 'disabled' : ''}>
+            <button class="add-to-cart-btn" ${!product.inStock ? 'disabled' : ''}>
                 ${product.inStock ? 'Add to Cart' : 'Sold Out'}
             </button>
             ${product.inStock ? `
@@ -237,6 +237,7 @@ function showProductDetail(productId) {
         const incrementBtn = detailContent.querySelector('.increment');
         const quantityValue = detailContent.querySelector('.quantity-value');
         const priceElement = detailContent.querySelector('.price');
+        const addToCartBtn = detailContent.querySelector('.add-to-cart-btn');
         let quantity = 1;
 
         // Update quantity and price
@@ -258,6 +259,18 @@ function showProductDetail(productId) {
                 quantity--;
                 updateQuantityAndPrice();
             }
+        });
+
+        // Add to cart button in detail view
+        addToCartBtn.addEventListener('click', () => {
+            handleAddToCart(productId, quantity);
+            // Visual feedback for detail view button
+            addToCartBtn.innerHTML = '<i class="fas fa-check"></i> Added';
+            addToCartBtn.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+                addToCartBtn.innerHTML = 'Add to Cart';
+                addToCartBtn.style.backgroundColor = '';
+            }, 2000);
         });
     }
 
@@ -282,13 +295,70 @@ function handleProductAction(action, productId) {
     }
 }
 
-// Handle add to cart (unchanged)
+// Function to update cart counter
+function updateCartCounter() {
+    const cart = JSON.parse(localStorage.getItem('plantShopCart')) || [];
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartCounter = document.querySelector('.cart-counter');
+    if (cartCounter) {
+        cartCounter.style.display = 'none'; // Always hide the counter
+    }
+}
+
+// Handle add to cart
 function handleAddToCart(productId, quantity) {
-    console.log(`Added ${quantity} of product ${productId} to cart`);
+    const product = newProducts.find(p => p.id == productId);
+    if (product) {
+        // Create cart item with all necessary details
+        const cartItem = {
+            id: product.id.toString(),
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            rating: product.rating,
+            description: product.description,
+            inStock: product.inStock,
+            quantity: quantity
+        };
+
+        // Get existing cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('plantShopCart')) || [];
+        
+        // Check if product already exists in cart
+        const existingProduct = cart.find(p => p.id === cartItem.id);
+        
+        if (existingProduct) {
+            // Update quantity if product exists
+            existingProduct.quantity += quantity;
+        } else {
+            // Add new product to cart
+            cart.push(cartItem);
+        }
+
+        // Save updated cart to localStorage
+        localStorage.setItem('plantShopCart', JSON.stringify(cart));
+
+        // Show visual feedback
+        const addToCartBtn = document.querySelector(`[data-product-id="${productId}"] .btn`);
+        if (addToCartBtn) {
+            addToCartBtn.innerHTML = '<i class="fas fa-check"></i> Added';
+            addToCartBtn.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+                addToCartBtn.innerHTML = 'Add to Cart';
+                addToCartBtn.style.backgroundColor = '';
+            }, 2000);
+        }
+
+        // Show confirmation message
+        alert(`${product.name} has been added to your cart!`);
+    }
 }
 
 // Initialize products and add event listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Update cart counter on page load
+    updateCartCounter();
+    
     // Render products
     renderNewProducts();
     renderBestProducts();
@@ -354,5 +424,4 @@ document.addEventListener('DOMContentLoaded', () => {
             productDetail.classList.remove('active');
         });
     }
-    
 });
