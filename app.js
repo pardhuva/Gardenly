@@ -63,7 +63,8 @@ async function initializeDatabase() {
                     ['seller2', 'seller789', 'Seller'],
                     ['seller3', 'seller101', 'Seller'],
                     ['buyer2', 'buyer456', 'Buyer'],
-                    ['buyer3', 'buyer789', 'Buyer']
+                    ['buyer3', 'buyer789', 'Buyer'],
+                    ['delivery1', 'delivery123', 'Delivery Manager']
                 ];
 
                 let completed = 0;
@@ -127,6 +128,51 @@ app.post('/addproduct', isAuthenticated, (req, res) => {
       }
     );
   });
+
+  
+app.post('/login', (req, res) => {
+    const { username, password, role } = req.body;
+
+    db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, user) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).send('Server error');
+        }
+
+        if (!user) {
+            return res.status(401).render('login', { 
+                error: 'Invalid username or password' 
+            });
+        }
+
+        console.log("User found:", user); // Debugging log
+
+        // Normalize role comparison (convert to lowercase)
+        if (user.role.toLowerCase() !== role.toLowerCase()) {
+            return res.status(401).render('login', { 
+                error: 'Role mismatch. Check your selected role.' 
+            });
+        }
+
+        req.session.user = user; // Store user session
+        console.log("Session stored:", req.session.user); // Debugging log
+
+        // Redirect based on role
+        switch (user.role) {
+            case 'Seller':
+                return res.redirect('/seller');
+            case 'Buyer':
+                return res.redirect('/');
+            case 'Admin':
+                return res.redirect('/admindashboard');
+            case 'Delivery Manager':
+                return res.redirect('/deliverymanager');
+            default:
+                return res.redirect('/'); // Fallback redirect
+        }
+    });
+});
+
 
 // Routes
 app.get('/', (req, res) => {
@@ -225,41 +271,46 @@ app.get('/sellerdashboard', isAuthenticated, (req, res) => {
         res.render('sellerdashboard', { products });
     });
 });
+  
+app.get('/deliverymanagerdashboard', (req, res) => {
+    const data = {
+        currentPage: 'dashboard',
+        user: { name: 'Pardhuva' },
+        metrics: {
+            pendingDeliveries: 24,
+            pendingChange: -15,
+            inTransit: 18,
+            inTransitChange: 12,
+            deliveredToday: 32,
+            deliveredChange: 28,
+            activeAgents: 8
+        },
+        recentOrders: [
+            { id: '#ORD-001', customer: 'Pardhuva', address: '123 Garden St', agent: 'Alex Johnson', status: 'delivered' },
+            { id: '#ORD-002', customer: 'Sri harsha', address: '456 Plant Ave', agent: 'Michael Brown', status: 'in-transit' }
+        ],
+        chartData: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: [12, 19, 3, 5, 2, 3, 10]
+        }
+    };
+    res.render('dashboard', data);
+});
 
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null; // Store user data globally
     next();
 });
 
-
-app.post('/login', (req, res) => {
-    const { username, password, role } = req.body;
-    
-    db.get('SELECT * FROM users WHERE username = ? AND password = ? AND role = ?', 
-        [username, password, role], 
-        (err, user) => {
-            if (err) {
-                console.error('Database error:', err);
-                return res.status(500).send('Server error');
-            }
-            
-            if (user) {
-                req.session.user = user;
-                
-                if (user.role === 'Seller') {
-                    return res.redirect('/seller');
-                } else if (user.role === 'Buyer') {
-                    return res.redirect('/');
-                } else if (user.role === 'Admin') {
-                    return res.redirect('/admindashboard');
-                }
-            } else {
-                return res.status(401).render('login', { 
-                    error: 'Invalid username, password, or role' 
-                });
-            }
-        });
+app.get('/deliverymanager', isAuthenticated, (req, res) => {
+    console.log("User session on deliverymanager:", req.session.user); // Debugging log
+    if (req.session.user.role !== 'Delivery Manager') {
+        return res.status(403).send('Access denied: Only Delivery Managers can access this page');
+    }
+    res.render('deliverymanager');
 });
+
+
 
 // Logout route
 app.get('/logout', (req, res) => {
