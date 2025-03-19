@@ -38,9 +38,7 @@
                     <li data-page="products">
                         <a href="#products"><i class="fas fa-box"></i> Products</a>
                     </li>
-                    <li data-page="orders">
-                        <a href="#orders"><i class="fas fa-shopping-cart"></i> Orders</a>
-                    </li>
+                   
                     <li data-page="analytics">
                         <a href="#analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
                     </li>
@@ -134,7 +132,7 @@
                 <div class="page-header">
                     <h1>Products</h1>
                     <div class="header-actions">
-                        <button id="add-product-btn" class="btn primary-btn">
+                        <button id="add-product-btn" class="btn primary-btn" onclick="addProduct()">
                             <i class="fas fa-plus-circle"></i> Add Product
                         </button>
                     </div>
@@ -220,91 +218,7 @@
                 </div>
             </section>
 
-            <!-- Orders Page -->
-            <section id="orders-page" class="page">
-                <div class="page-header">
-                    <h1>Orders</h1>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Order Management</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="table-container">
-                            <table id="orders-table" class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer</th>
-                                        <th>Date</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>#ORD-001</td>
-                                        <td>Sri Harsha</td>
-                                        <td>2023-06-15</td>
-                                        <td>$129.97</td>
-                                        <td><span class="status delivered">Delivered</span></td>
-                                        <td>
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#ORD-002</td>
-                                        <td>Pardhuva</td>
-                                        <td>2023-06-14</td>
-                                        <td>$54.98</td>
-                                        <td><span class="status shipped">Shipped</span></td>
-                                        <td>
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#ORD-003</td>
-                                        <td>Abhyass</td>
-                                        <td>2023-06-14</td>
-                                        <td>$79.99</td>
-                                        <td><span class="status processing">Processing</span></td>
-                                        <td>
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#ORD-004</td>
-                                        <td>Sai Teja</td>
-                                        <td>2023-06-13</td>
-                                        <td>$37.97</td>
-                                        <td><span class="status delivered">Delivered</span></td>
-                                        <td>
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#ORD-005</td>
-                                        <td>Satish</td>
-                                        <td>2023-06-12</td>
-                                        <td>$149.95</td>
-                                        <td><span class="status cancelled">Cancelled</span></td>
-                                        <td>
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn"><i class="fas fa-edit"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+           
 
             <!-- Analytics Page -->
             <section id="analytics-page" class="page">

@@ -354,4 +354,5 @@ document.addEventListener('DOMContentLoaded', () => {
             productDetail.classList.remove('active');
         });
     }
+    
 });

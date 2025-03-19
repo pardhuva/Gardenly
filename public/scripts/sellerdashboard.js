@@ -73,12 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   })
 
-  // Add Product Button
-  if (addProductBtn) {
-    addProductBtn.addEventListener("click", () => {
-      alert("Add Product functionality will be implemented here.")
-    })
-  }
+ 
 
   // Settings Form
   if (settingsForm) {
@@ -234,4 +229,73 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(initCharts, 100)
   })
 })
+document.getElementById("add-product-btn").addEventListener("click", () => {
+  const name = document.getElementById("product-name").value;
+  const price = parseFloat(document.getElementById("product-price").value);
+  const quantity = parseInt(document.getElementById("product-quantity").value, 10);
 
+  if (name && !isNaN(price) && !isNaN(quantity)) {
+      fetch("http://localhost:7000/add-product", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, price, quantity })
+      })
+      .then(response => response.json())
+      .then(data => {
+          alert(data.message);
+          loadProducts();
+      })
+      .catch(error => console.error("Error:", error));
+  } else {
+      alert("Please enter valid product details.");
+  }
+});
+document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); // Prevent page refresh
+
+  // Collect form data
+  const formData = new FormData(e.target);
+  const productData = {
+    name: formData.get('name'),
+    description: formData.get('description'),
+    price: parseFloat(formData.get('price')),
+    category: formData.get('category'),
+    image: formData.get('image'),
+  };
+
+  try {
+    const response = await fetch('/addproduct', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (response.ok) {
+      alert('Product added successfully');
+      window.location.href = "/sellerdashboard"; // Redirect to seller dashboard
+    } else {
+      const errorData = await response.json();
+      alert(`Failed to add product: ${errorData.message}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while adding the product');
+  }
+});
+
+function loadProducts() {
+  fetch("http://localhost:3000/get-products")
+      .then(response => response.json())
+      .then(data => {
+          const productList = document.getElementById("product-list");
+          productList.innerHTML = "";
+          data.forEach(row => {
+              const li = document.createElement("li");
+              li.textContent = `${row.name} - $${row.price} - Quantity: ${row.quantity}`;
+              productList.appendChild(li);
+          });
+      })
+      .catch(error => console.error("Error:", error));
+}
