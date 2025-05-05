@@ -7,19 +7,19 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #fff; /* Normal background color */
+    background-color: #fff;
     color: #333;
     line-height: 1.6;
 }
 
 /* Add padding to account for fixed header */
 body {
-    padding-top: 60px; /* Adjusted to match the minimized header height */
+    padding-top: 60px;
 }
 
 /* Custom styling for header in seller page */
 header.header {
-    background-color: #fff; /* Distinct background color for header */
+    background-color: #fff;
     padding: 0.5rem 5%;
     display: flex;
     align-items: center;
@@ -34,25 +34,25 @@ header.header {
 
 /* Style for the Gardenly logo */
 header.header .logo {
-    color: #00e926 !important; /* Default color for Gardenly text set to green */
+    color: #00e926 !important;
     font-weight: bold;
 }
 
 header.header .logo i {
-    color: #00e926 !important; /* Default color for Gardenly icon set to green */
+    color: #00e926 !important;
 }
 
 /* Navbar links styling */
 header.header .navbar a {
-    color: #333; /* Default color for navbar links */
-    text-decoration: none !important; /* Remove text decoration (underline) */
+    color: #333;
+    text-decoration: none !important;
     transition: color 0.3s ease-in-out;
 }
 
 /* Hover effect for navbar links */
 header.header .navbar a:hover,
 header.header .navbar a.active {
-    color: #00e926 !important; /* Green color on hover */
+    color: #00e926 !important;
 }
 
 /* Seller Container Styles */
@@ -78,7 +78,7 @@ form {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Base input and button styles */
+/* Input and button styles */
 input, button {
     padding: 15px;
     font-size: 20px;
@@ -86,53 +86,10 @@ input, button {
     border-radius: 5px;
 }
 
-/* Full width inputs for main form fields */
-#seller-product-form > input:not(.size-entry input) {
+/* Full width inputs for form fields */
+#seller-product-form > input {
     width: 100%;
     margin: 12px 0;
-}
-
-/* Size entry specific styles */
-#sizes-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 12px 0;
-}
-
-.size-entry {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.size-entry input {
-    flex: 1;
-    margin: 0;
-}
-
-.remove-size {
-    padding: 15px;
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.remove-size:hover {
-    background-color: #cc0000;
-}
-
-#add-size {
-    align-self: flex-start;
-    background-color: #2196F3;
-    margin: 12px 0;
-}
-
-#add-size:hover {
-    background-color: #0b7dda;
 }
 
 /* Section Titles */
@@ -155,7 +112,7 @@ h2, .seller-section-title {
     padding: 1rem;
 }
 
-.seller-product {
+.product-card {
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -163,28 +120,28 @@ h2, .seller-section-title {
     transition: transform 0.2s;
 }
 
-.seller-product:hover {
+.product-card:hover {
     transform: translateY(-5px);
 }
 
-.seller-product img {
+.product-card img {
     width: 100%;
-    height: 200px;
+izzano: 200px;
     object-fit: cover;
     border-radius: 4px;
 }
 
-.seller-product h3 {
+.product-card h3 {
     margin: 0.5rem 0;
     font-size: 1.1rem;
 }
 
-.seller-product p {
+.product-card p {
     margin: 0.25rem 0;
     color: #666;
 }
 
-.seller-product button {
+.product-card button {
     margin: 0.5rem 0.25rem;
     padding: 0.5rem 1rem;
     border: none;
@@ -194,7 +151,7 @@ h2, .seller-section-title {
     color: white;
 }
 
-.seller-product button:hover {
+.product-card button:hover {
     background: #45a049;
 }
 
@@ -210,12 +167,12 @@ h2, .seller-section-title {
 }
 
 /* Buttons */
-.seller-details-btn {
+.view-details-btn {
     background-color: #27ae60;
     color: white;
 }
 
-.seller-details-btn:hover {
+.view-details-btn:hover {
     background-color: #219150;
 }
 
@@ -298,34 +255,6 @@ h2, .seller-section-title {
     color: #333;
 }
 
-.seller-modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.seller-modal-buttons button {
-    flex: 1;
-    padding: 15px;
-    font-size: 18px;
-}
-
-.seller-buy-btn {
-    background-color: #3498db;
-}
-
-.seller-buy-btn:hover {
-    background-color: #2980b9;
-}
-
-.seller-cart-btn {
-    background-color: #27ae60;
-}
-
-.seller-cart-btn:hover {
-    background-color: #219150;
-}
-
 /* Overlay */
 .seller-overlay {
     display: none;
@@ -344,19 +273,19 @@ h2, .seller-section-title {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .seller-product-grid {
+    .product-list {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .seller-product-grid {
+    .product-list {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 480px) {
-    .seller-product-grid {
+    .product-list {
         grid-template-columns: 1fr;
     }
 }
