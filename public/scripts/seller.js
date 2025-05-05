@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     const productForm = document.getElementById("seller-product-form");
-    const productList = document.getElementById("seller-product-list");
     const topSales = document.getElementById("seller-top-sales");
     const recentSales = document.getElementById("seller-recent-sales");
     const productModal = document.getElementById("seller-product-modal");
@@ -12,10 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalSold = document.getElementById("seller-modal-sold");
     const modalDescription = document.getElementById("seller-modal-description");
     const closeBtn = document.querySelector(".seller-close");
-    const sizesContainer = document.getElementById("sizes-container");
-    const addSizeButton = document.getElementById("add-size");
 
     let products = [];
+    let isSubmitting = false;
 
     // Function to fetch top sales from server
     async function fetchTopSales() {
@@ -44,20 +42,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to create a product card
     function createProductCard(product) {
         const productDiv = document.createElement("div");
-        productDiv.className = "seller-product";
+        productDiv.className = "product-card";
+        productDiv.setAttribute('data-product-id', product.id);
         productDiv.innerHTML = `
             <img src="${product.image}" alt="${product.name}">
             <h3>${product.name}</h3>
-            <p>Price: ${product.price}</p>
-            <p>Quantity: ${product.quantity}</p>
-            <p>Sold: ${product.sold}</p>
-            <button class="seller-details-btn" data-product-id="${product.id}">View Details</button>
-            <button class="seller-edit-btn" data-product-id="${product.id}">Edit</button>
-            <button class="seller-delete-btn" data-product-id="${product.id}">Delete</button>
+            <p class="price">${product.price}</p>
+            <p class="quantity">Quantity: ${product.quantity}</p>
+            <p class="sold">Sold: ${product.sold}</p>
+            <button class="view-details-btn">View Details</button>
+            <button class="seller-edit-btn">Edit</button>
+            <button class="seller-delete-btn">Delete</button>
         `;
 
         // Add event listeners for the buttons
-        productDiv.querySelector(".seller-details-btn").addEventListener("click", () => showProductDetails(product));
+        productDiv.querySelector(".view-details-btn").addEventListener("click", () => showProductDetails(product));
         productDiv.querySelector(".seller-edit-btn").addEventListener("click", () => editProduct(product));
         productDiv.querySelector(".seller-delete-btn").addEventListener("click", () => deleteProduct(product));
 
@@ -73,27 +72,40 @@ document.addEventListener("DOMContentLoaded", () => {
         modalSold.textContent = `Sold: ${product.sold}`;
         modalDescription.textContent = product.description || "No description available";
         
-        productModal.style.display = "block";
-        overlay.style.display = "block";
+        productModal.classList.add('active');
+        overlay.classList.add('active');
     }
 
     // Function to edit a product
     async function editProduct(product) {
         const newName = prompt("Enter new product name:", product.name);
+        const newDescription = prompt("Enter new description:", product.description || "");
+        const newCategory = prompt("Enter new category:", product.category || "");
         const newPrice = prompt("Enter new price (e.g., 10.99):", product.price.replace('$', ''));
         const newQuantity = prompt("Enter new quantity:", product.quantity);
-        const newDescription = prompt("Enter new description:", product.description);
 
-        if (newName && newPrice && newQuantity && newDescription) {
+        if (newName && newDescription !== null && newCategory && newPrice && newQuantity) {
+            const priceNum = parseFloat(newPrice);
+            const quantityNum = parseInt(newQuantity);
+            if (isNaN(priceNum) || priceNum <= 0) {
+                alert('Price must be a positive number.');
+                return;
+            }
+            if (isNaN(quantityNum) || quantityNum < 0) {
+                alert('Quantity must be a non-negative integer.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/api/products/${product.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         name: newName,
-                        price: newPrice,
-                        quantity: newQuantity,
-                        description: newDescription
+                        description: newDescription,
+                        category: newCategory,
+                        price: priceNum,
+                        quantity: quantityNum
                     })
                 });
 
@@ -111,10 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 await renderProducts();
+                alert('Product updated successfully!');
             } catch (error) {
                 console.error('Error updating product:', error);
                 alert(error.message || 'Failed to update product. Please try again.');
             }
+        } else {
+            alert('All fields are required.');
         }
     }
 
@@ -141,6 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 products = products.filter(p => p.id !== product.id);
                 await renderProducts();
+                alert('Product deleted successfully!');
             } catch (error) {
                 console.error('Error deleting product:', error);
                 alert(error.message || 'Failed to delete product. Please try again.');
@@ -150,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to render all products
     async function renderProducts() {
-        productList.innerHTML = "";
+        // Clear top and recent sales
         topSales.innerHTML = "";
         recentSales.innerHTML = "";
 
@@ -162,20 +178,74 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             products = await response.json();
 
-            // Render all products
-            products.forEach(product => {
-                const productCard = createProductCard(product);
-                productList.appendChild(productCard);
-            });
+            // Clear existing product lists within categories
+            document.querySelectorAll('.product-list').forEach(list => list.innerHTML = "");
 
-            // Fetch and render top sales
+            // Group products by category
+            const productsByCategory = products.reduce((acc, product) => {
+                const category = product.category || 'Uncategorized';
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(product);
+                return acc;
+            }, {});
+
+            // Get the seller products container
+            const sellerProducts = document.querySelector('.seller-products');
+
+            // Ensure the "Your Products" heading exists
+            if (!sellerProducts.querySelector('h2')) {
+                sellerProducts.innerHTML = '<h2>Your Products</h2>';
+            }
+
+            // Handle empty state
+            if (Object.keys(productsByCategory).length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'No products found. Add a product to get started!';
+                sellerProducts.appendChild(emptyMessage);
+            } else {
+                // Remove empty state message if it exists
+                const emptyMessage = sellerProducts.querySelector('p');
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+
+                // Render products for each category
+                Object.keys(productsByCategory).forEach(category => {
+                    const categoryId = category.toLowerCase().replace(/\s+/g, '-');
+                    // Check for existing category section (case-insensitive)
+                    let categorySection = Array.from(document.querySelectorAll('.category-section h3'))
+                        .find(h3 => h3.textContent.toLowerCase() === category.toLowerCase())?.parentElement;
+
+                    if (!categorySection) {
+                        // Create new category section if it doesn't exist
+                        categorySection = document.createElement('div');
+                        categorySection.className = 'category-section';
+                        categorySection.innerHTML = `
+                            <h3>${category}</h3>
+                            <div class="product-list" id="seller-product-list-${categoryId}"></div>
+                        `;
+                        sellerProducts.appendChild(categorySection);
+                    }
+
+                    // Get the product list for this category
+                    const categoryList = categorySection.querySelector(`#seller-product-list-${categoryId}`);
+                    productsByCategory[category].forEach(product => {
+                        const productCard = createProductCard(product);
+                        categoryList.appendChild(productCard);
+                    });
+                });
+            }
+
+            // Render top sales
             const topProducts = await fetchTopSales();
             topProducts.forEach(product => {
                 const productCard = createProductCard(product);
                 topSales.appendChild(productCard);
             });
 
-            // Fetch and render recent sales
+            // Render recent sales
             const recentProducts = await fetchRecentSales();
             recentProducts.forEach(product => {
                 const productCard = createProductCard(product);
@@ -210,51 +280,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Add event listener for adding new size fields
-    addSizeButton.addEventListener("click", () => {
-        const sizeEntry = document.createElement("div");
-        sizeEntry.className = "size-entry";
-        sizeEntry.innerHTML = `
-            <input type="text" class="size-name" placeholder="Size (e.g., Small, Medium)" required>
-            <input type="number" class="size-price" placeholder="Price ($)" step="0.01" required>
-            <input type="number" class="size-quantity" placeholder="Quantity" min="1" required>
-            <button type="button" class="remove-size">Remove</button>
-        `;
-        sizesContainer.appendChild(sizeEntry);
-    });
-
-    // Add event delegation for remove size buttons
-    sizesContainer.addEventListener("click", (e) => {
-        if (e.target.classList.contains("remove-size")) {
-            if (sizesContainer.children.length > 1) {
-                e.target.parentElement.remove();
-            } else {
-                alert("At least one size is required");
-            }
-        }
-    });
-
     // Form submission handler
     productForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
+        if (isSubmitting) return;
+        isSubmitting = true;
+
         const name = document.getElementById('seller-product-name').value.trim();
         const description = document.getElementById('seller-product-description').value.trim();
         const category = document.getElementById('seller-product-category').value.trim();
+        const price = document.getElementById('seller-product-price').value;
+        const quantity = document.getElementById('seller-product-quantity').value;
         const imageFile = document.getElementById('seller-product-image').files[0];
 
         if (!name) {
             alert('Please enter a product name');
+            isSubmitting = false;
             return;
         }
 
         if (!imageFile) {
             alert('Please select a product image');
+            isSubmitting = false;
+            return;
+        }
+
+        if (imageFile.size > 5 * 1024 * 1024) {
+            alert('Image file size exceeds 5MB. Please select a smaller image.');
+            isSubmitting = false;
             return;
         }
 
         if (!category) {
             alert('Please enter a category');
+            isSubmitting = false;
+            return;
+        }
+
+        const priceNum = parseFloat(price);
+        const quantityNum = parseInt(quantity);
+        if (!price || isNaN(priceNum) || priceNum <= 0) {
+            alert('Please enter a valid positive price');
+            isSubmitting = false;
+            return;
+        }
+        if (!quantity || isNaN(quantityNum) || quantityNum <= 0) {
+            alert('Please enter a valid positive quantity');
+            isSubmitting = false;
+            return;
+        }
+
+        // Compress the image
+        let compressedImage;
+        try {
+            compressedImage = await compressImage(imageFile);
+        } catch (error) {
+            console.error('Error compressing image:', error);
+            alert('Failed to compress image');
+            isSubmitting = false;
             return;
         }
 
@@ -263,39 +346,11 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append('name', name);
         formData.append('description', description);
         formData.append('category', category);
-        formData.append('image', imageFile);
+        formData.append('price', priceNum);
+        formData.append('quantity', quantityNum);
 
-        // Collect size information
-        const sizeInputs = document.querySelectorAll('.size-entry');
-        const sizes = [];
-        let hasValidSize = false;
-
-        sizeInputs.forEach(input => {
-            const size = input.querySelector('.size-name').value.trim();
-            const price = input.querySelector('.size-price').value;
-            const quantity = input.querySelector('.size-quantity').value;
-            
-            if (size && price && quantity) {
-                const priceNum = parseFloat(price);
-                const quantityNum = parseInt(quantity);
-                
-                if (!isNaN(priceNum) && !isNaN(quantityNum) && priceNum > 0 && quantityNum > 0) {
-                    sizes.push({
-                        size,
-                        price: priceNum,
-                        quantity: quantityNum
-                    });
-                    hasValidSize = true;
-                }
-            }
-        });
-
-        if (!hasValidSize) {
-            alert('Please add at least one size with valid price and quantity');
-            return;
-        }
-
-        formData.append('sizes', JSON.stringify(sizes));
+        const blob = await fetch(compressedImage).then(res => res.blob());
+        formData.append('image', blob, imageFile.name);
 
         try {
             const response = await fetch('/addproduct', {
@@ -307,56 +362,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log('Server response:', result);
             
             if (result.success) {
-                // Reset the form
                 e.target.reset();
-                // Clear the sizes container
-                const sizesContainer = document.getElementById('sizes-container');
-                sizesContainer.innerHTML = '';
-                // Add one empty size entry
-                addSizeEntry();
-                
-                // Add the new product to the UI
-                const category = result.product.category || 'Uncategorized';
-                const categoryId = category.toLowerCase().replace(/\s+/g, '-');
-                
-                // Find or create the category section
-                let categorySection = document.querySelector(`.category-section h3:contains('${category}')`)?.parentElement;
-                
-                if (!categorySection) {
-                    const sellerProducts = document.querySelector('.seller-products');
-                    categorySection = document.createElement('div');
-                    categorySection.className = 'category-section';
-                    categorySection.innerHTML = `
-                        <h3>${category}</h3>
-                        <div class="product-list" id="seller-product-list-${categoryId}"></div>
-                    `;
-                    sellerProducts.appendChild(categorySection);
-                }
-                
-                // Get the product list for this category
-                const categoryList = categorySection.querySelector(`#seller-product-list-${categoryId}`);
-                
-                // Create product card
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.setAttribute('data-product-id', result.product.id);
-                productCard.innerHTML = `
-                    <img src="${result.product.image}" alt="${result.product.name}">
-                    <h3>${result.product.name}</h3>
-                    <p class="price">${result.product.price}</p>
-                    <p class="quantity">Quantity: ${result.product.quantity}</p>
-                    <p class="sold">Sold: ${result.product.sold}</p>
-                    <button class="view-details-btn">View Details</button>
-                `;
-                
-                // Add product to category list
-                categoryList.insertBefore(productCard, categoryList.firstChild);
-                
-                // Add to recent sales
-                const recentSales = document.getElementById('seller-recent-sales');
-                recentSales.insertBefore(productCard.cloneNode(true), recentSales.firstChild);
-                
-                // Show success message
+                await renderProducts();
                 alert('Product added successfully!');
             } else {
                 alert(result.message || 'Failed to add product');
@@ -364,12 +371,21 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             console.error('Error adding product:', error);
             alert('Failed to add product');
+        } finally {
+            isSubmitting = false;
         }
     });
 
     // Event listeners
-    closeBtn.addEventListener("click", closeModal);
-    overlay.addEventListener("click", closeModal);
+    closeBtn.addEventListener("click", () => {
+        productModal.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+
+    overlay.addEventListener("click", () => {
+        productModal.classList.remove('active');
+        overlay.classList.remove('active');
+    });
 
     // Initial render
     renderProducts();
