@@ -104,7 +104,6 @@ app.post('/register', async (req, res) => {
     }
 
     try {
-        // Check if username, email, or mobile already exists
         const existingUser = await User.findOne({
             $or: [
                 { username },
@@ -114,13 +113,12 @@ app.post('/register', async (req, res) => {
         });
 
         if (existingUser) {
-                return res.status(400).render('register', { 
-                    error: 'Username, email, or mobile already exists',
-                    user: null
-                });
-            }
+            return res.status(400).render('register', { 
+                error: 'Username, email, or mobile already exists',
+                user: null
+            });
+        }
 
-        // Create new user
         const newUser = new User({
             username,
             password,
@@ -130,7 +128,7 @@ app.post('/register', async (req, res) => {
         });
 
         await newUser.save();
-            res.redirect('/login');
+        res.redirect('/login');
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).render('register', { 
@@ -181,15 +179,24 @@ app.post('/addproduct', isAuthenticated, isSeller, upload.single('image'), async
     try {
         console.log('Received addproduct request:', req.body);
         
-        const { name, description, category, sizes } = req.body;
+        const { name, description, category, price, quantity } = req.body;
         const imageFile = req.file;
 
-        if (!name || !imageFile) {
-            return res.status(400).json({ success: false, message: 'Product name and image are required' });
+        if (!name || !imageFile || !price || !quantity) {
+            return res.status(400).json({ success: false, message: 'Product name, image, price, and quantity are required' });
         }
 
         if (!category) {
             return res.status(400).json({ success: false, message: 'Category is required' });
+        }
+
+        const priceNum = parseFloat(price);
+        const quantityNum = parseInt(quantity);
+        if (isNaN(priceNum) || priceNum <= 0) {
+            return res.status(400).json({ success: false, message: 'Price must be a positive number' });
+        }
+        if (isNaN(quantityNum) || quantityNum <= 0) {
+            return res.status(400).json({ success: false, message: 'Quantity must be a positive integer' });
         }
 
         // Process the image file
@@ -197,27 +204,20 @@ app.post('/addproduct', isAuthenticated, isSeller, upload.single('image'), async
         const base64Image = imageBuffer.toString('base64');
         const imageDataUrl = `data:${imageFile.mimetype};base64,${base64Image}`;
 
-        // Parse sizes if it's a string
-        const parsedSizes = typeof sizes === 'string' ? JSON.parse(sizes) : sizes;
-
-        // Calculate base price from minimum size price
-        const basePrice = Math.min(...parsedSizes.map(size => size.price));
-
         const product = new Product({
             name,
             description,
             category,
             image: imageDataUrl,
             seller_id: req.session.user._id,
-            price: basePrice,
-            quantity: parsedSizes.reduce((sum, size) => sum + size.quantity, 0),
-            sizes: parsedSizes
+            price: priceNum,
+            quantity: quantityNum,
+            sold: 0
         });
 
         const savedProduct = await product.save();
         console.log('Product saved successfully:', savedProduct);
 
-        // Return success response with product data
         res.status(200).json({
             success: true,
             message: 'Product added successfully',
@@ -229,7 +229,6 @@ app.post('/addproduct', isAuthenticated, isSeller, upload.single('image'), async
                 quantity: savedProduct.quantity,
                 sold: savedProduct.sold,
                 description: savedProduct.description,
-                sizes: savedProduct.sizes,
                 category: savedProduct.category,
                 type: 'recent'
             }
@@ -241,25 +240,21 @@ app.post('/addproduct', isAuthenticated, isSeller, upload.single('image'), async
 });
 
 app.put('/api/products/:id', isAuthenticated, isSeller, async (req, res) => {
-    const { name, description, category, sizes } = req.body;
+    const { name, description, category, price, quantity } = req.body;
     const productId = req.params.id;
     const seller_id = req.session.user._id;
 
-    if (!name || !sizes || !Array.isArray(sizes) || sizes.length === 0) {
-        return res.status(400).json({ message: 'Product name and at least one size are required' });
+    if (!name || !price || !quantity) {
+        return res.status(400).json({ message: 'Product name, price, and quantity are required' });
     }
 
-    // Validate sizes
-    for (const size of sizes) {
-        if (!size.size || !size.price || size.quantity === undefined) {
-            return res.status(400).json({ message: 'Each size must have size name, price, and quantity' });
-        }
-        if (isNaN(parseFloat(size.price)) || parseFloat(size.price) < 0) {
-            return res.status(400).json({ message: 'Size price must be a positive number' });
-        }
-        if (isNaN(parseInt(size.quantity)) || parseInt(size.quantity) < 0) {
-            return res.status(400).json({ message: 'Size quantity must be a positive number' });
-        }
+    const priceNum = parseFloat(price);
+    const quantityNum = parseInt(quantity);
+    if (isNaN(priceNum) || priceNum <= 0) {
+        return res.status(400).json({ message: 'Price must be a positive number' });
+    }
+    if (isNaN(quantityNum) || quantityNum < 0) {
+        return res.status(400).json({ message: 'Quantity must be a non-negative integer' });
     }
 
     try {
@@ -269,26 +264,21 @@ app.put('/api/products/:id', isAuthenticated, isSeller, async (req, res) => {
                 name,
                 description,
                 category,
-                price: Math.min(...sizes.map(s => parseFloat(s.price))),
-                quantity: sizes.reduce((sum, size) => sum + parseInt(size.quantity), 0),
-                sizes: sizes.map(size => ({
-                    size: size.size,
-                    price: parseFloat(size.price),
-                    quantity: parseInt(size.quantity)
-                }))
+                price: priceNum,
+                quantity: quantityNum
             },
             { new: true }
         );
 
         if (!updatedProduct) {
-                return res.status(404).json({ message: 'Product not found or not owned by seller' });
-            }
+            return res.status(404).json({ message: 'Product not found or not owned by seller' });
+        }
 
-            res.json({ message: 'Product updated successfully' });
+        res.json({ message: 'Product updated successfully' });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ message: 'Database error', error: error.message });
-        }
+    }
 });
 
 app.delete('/api/products/:id', isAuthenticated, isSeller, async (req, res) => {
@@ -298,13 +288,13 @@ app.delete('/api/products/:id', isAuthenticated, isSeller, async (req, res) => {
     try {
         const result = await Product.findOneAndDelete({ _id: productId, seller_id });
         if (!result) {
-                return res.status(404).json({ message: 'Product not found or not owned by seller' });
-            }
-            res.json({ message: 'Product deleted successfully' });
+            return res.status(404).json({ message: 'Product not found or not owned by seller' });
+        }
+        res.json({ message: 'Product deleted successfully' });
     } catch (error) {
         console.error('Database error:', error);
         res.status(500).json({ message: 'Database error', error: error.message });
-        }
+    }
 });
 
 // Ticket routes
@@ -499,7 +489,7 @@ app.get('/beforeseller', (req, res) => res.render('beforeseller', { user: req.se
 
 app.get('/seller', isAuthenticated, isSeller, async (req, res) => {
     try {
-        // Get all products for the current seller
+        // Fetch only the seller's products from the database
         const products = await Product.find({ seller_id: req.session.user._id });
         
         // Group products by category
@@ -512,14 +502,14 @@ app.get('/seller', isAuthenticated, isSeller, async (req, res) => {
             return acc;
         }, {});
 
-        // Get recent sales (last 5 products)
+        // Fetch recent sales (last 5 products by creation date)
         const recentSales = await Product.find({ 
             seller_id: req.session.user._id 
         })
         .sort({ createdAt: -1 })
         .limit(5);
 
-        // Get top sales (products with highest quantity sold)
+        // Fetch top sales (top 5 by sold quantity)
         const topSales = await Product.find({ 
             seller_id: req.session.user._id 
         })
@@ -540,10 +530,11 @@ app.get('/seller', isAuthenticated, isSeller, async (req, res) => {
 
 app.get('/api/recent-sales', isAuthenticated, isSeller, async (req, res) => {
     try {
-        // Get the 5 most recently added products for the current seller
-        const products = await Product.find({ seller_id: req.session.user._id })
-            .sort({ _id: -1 }) // Sort by creation date (newest first)
-            .limit(5);
+        const products = await Product.find({ 
+            seller_id: req.session.user._id
+        })
+        .sort({ _id: -1 })
+        .limit(5);
         
         res.json(products.map(p => ({
             id: p._id,
@@ -553,7 +544,7 @@ app.get('/api/recent-sales', isAuthenticated, isSeller, async (req, res) => {
             quantity: p.quantity,
             sold: p.sold,
             description: p.description,
-            sizes: p.sizes,
+            category: p.category,
             type: 'recent'
         })));
     } catch (error) {
@@ -583,13 +574,11 @@ app.get('/sellerdashboard', isSeller, async (req, res) => {
         const sellerId = req.session.user._id;
         const products = await Product.find({ seller_id: sellerId });
 
-        // Calculate dashboard metrics
         const totalRevenue = products.reduce((sum, product) => sum + (product.price * product.sold), 0);
         const totalProducts = products.length;
         const totalSales = products.reduce((sum, product) => sum + product.sold, 0);
         const activeProducts = products.filter(product => product.quantity > 0).length;
 
-        // Get top sales data
         const topSales = products
             .filter(product => product.sold > 0)
             .sort((a, b) => b.sold - a.sold)
@@ -605,7 +594,6 @@ app.get('/sellerdashboard', isSeller, async (req, res) => {
                 type: 'recent'
             }));
 
-        // Get sales data for charts
         const revenueData = await Product.aggregate([
             { $match: { seller_id: sellerId, sold: { $gt: 0 } } },
             { $group: {
@@ -615,7 +603,6 @@ app.get('/sellerdashboard', isSeller, async (req, res) => {
             { $sort: { _id: 1 } }
         ]);
 
-            // Get category-wise sales data
         const categoryData = await Product.aggregate([
             { $match: { seller_id: sellerId, sold: { $gt: 0 } } },
             { $group: {
@@ -625,17 +612,17 @@ app.get('/sellerdashboard', isSeller, async (req, res) => {
             }}
         ]);
 
-                res.render('sellerdashboard', {
-                    user: req.session.user,
-                    products,
-                    metrics: {
-                        totalRevenue,
-                        totalProducts,
-                        totalSales,
-                        activeProducts
-                    },
-                    revenueData,
-                    categoryData,
+        res.render('sellerdashboard', {
+            user: req.session.user,
+            products,
+            metrics: {
+                totalRevenue,
+                totalProducts,
+                totalSales,
+                activeProducts
+            },
+            revenueData,
+            categoryData,
             topSales: topSales.length > 0 ? topSales : []
         });
     } catch (error) {
@@ -676,7 +663,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Authentication check route (for client-side validation)
+// Authentication check route
 app.get('/api/check-auth', (req, res) => {
     res.json({ isAuthenticated: !!req.session.user });
 });
@@ -690,16 +677,8 @@ app.use((err, req, res, next) => {
 // Seller products API endpoint
 app.get('/api/seller/products', isAuthenticated, isSeller, async (req, res) => {
     try {
-        // Get the current session's login time
-        const sessionStartTime = req.session.loginTime || new Date();
-        if (!req.session.loginTime) {
-            req.session.loginTime = sessionStartTime;
-        }
-
-        // Only get products added after the current session started
         const products = await Product.find({ 
-            seller_id: req.session.user._id,
-            createdAt: { $gte: sessionStartTime }
+            seller_id: req.session.user._id
         });
 
         res.json(products.map(p => ({
@@ -710,12 +689,38 @@ app.get('/api/seller/products', isAuthenticated, isSeller, async (req, res) => {
             quantity: p.quantity,
             sold: p.sold,
             description: p.description,
-            sizes: p.sizes,
+            category: p.category,
             type: 'recent'
         })));
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Top sales API endpoint
+app.get('/api/top-sales', isAuthenticated, isSeller, async (req, res) => {
+    try {
+        const products = await Product.find({ 
+            seller_id: req.session.user._id
+        })
+        .sort({ sold: -1 })
+        .limit(5);
+        
+        res.json(products.map(p => ({
+            id: p._id,
+            name: p.name,
+            price: `$${p.price.toFixed(2)}`,
+            image: p.image,
+            quantity: p.quantity,
+            sold: p.sold,
+            description: p.description,
+            category: p.category,
+            type: 'top'
+        })));
+    } catch (error) {
+        console.error('Error fetching top sales:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -731,30 +736,3 @@ initializeDatabase()
         console.error('Failed to initialize database:', err);
         process.exit(1);
     });
-
-app.get('/api/top-sales', isAuthenticated, isSeller, async (req, res) => {
-    try {
-        // Only get top selling products for the current seller
-        const products = await Product.find({ 
-            seller_id: req.session.user._id,
-            createdAt: { $gte: req.session.loginTime }
-        })
-        .sort({ sold: -1 })
-        .limit(5);
-        
-        res.json(products.map(p => ({
-            id: p._id,
-            name: p.name,
-            price: `$${p.price.toFixed(2)}`,
-            image: p.image,
-            quantity: p.quantity,
-            sold: p.sold,
-            description: p.description,
-            sizes: p.sizes,
-            type: 'top'
-        })));
-    } catch (error) {
-        console.error('Error fetching top sales:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
