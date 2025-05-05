@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gardenly - Product Listing</title>
+    <title>Gardenly - Seller Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
@@ -46,45 +46,45 @@
         <form id="seller-product-form">
             <input type="text" id="seller-product-name" placeholder="Product Name" required>
             <input type="text" id="seller-product-description" placeholder="Product Description">
-            <input type="text" id="seller-product-category" placeholder="Category (e.g., Plants, Pots)">
+            <input type="text" id="seller-product-category" placeholder="Category (e.g., Plants, Pots)" required>
             <input type="file" id="seller-product-image" accept="image/*" required>
-            
-            <div id="sizes-container">
-                <div class="size-entry">
-                    <input type="text" class="size-name" placeholder="Size (e.g., Small, Medium)" required>
-                    <input type="number" class="size-price" placeholder="Price ($)" step="0.01" required>
-                    <input type="number" class="size-quantity" placeholder="Quantity" min="1" required>
-                    <button type="button" class="remove-size">Remove</button>
-                </div>
-            </div>
-            <button type="button" id="add-size">Add Another Size</button>
+            <input type="number" id="seller-product-price" placeholder="Price ($)" step="0.01" min="0.01" required>
+            <input type="number" id="seller-product-quantity" placeholder="Quantity" min="1" required>
             <button type="submit">Post Product</button>
         </form>
     </div>
 
     <!-- Product List -->
     <div class="seller-content">
+        <!-- Your Products -->
         <div class="seller-products">
             <h2>Your Products</h2>
-            <% Object.keys(productsByCategory).forEach(category => { %>
-                <div class="category-section">
-                    <h3><%= category %></h3>
-                    <div class="product-list" id="seller-product-list-<%= category.toLowerCase().replace(/\s+/g, '-') %>">
-                        <% productsByCategory[category].forEach(product => { %>
-                            <div class="product-card" data-product-id="<%= product._id %>">
-                                <img src="<%= product.image %>" alt="<%= product.name %>">
-                                <h3><%= product.name %></h3>
-                                <p class="price">$<%= product.price.toFixed(2) %></p>
-                                <p class="quantity">Quantity: <%= product.quantity %></p>
-                                <p class="sold">Sold: <%= product.sold %></p>
-                                <button class="view-details-btn">View Details</button>
-                            </div>
-                        <% }); %>
+            <% if (Object.keys(productsByCategory).length === 0) { %>
+                <p>No products found. Add a product to get started!</p>
+            <% } else { %>
+                <% Object.keys(productsByCategory).forEach(category => { %>
+                    <div class="category-section">
+                        <h3><%= category %></h3>
+                        <div class="product-list" id="seller-product-list-<%= category.toLowerCase().replace(/\s+/g, '-') %>">
+                            <% productsByCategory[category].forEach(product => { %>
+                                <div class="product-card" data-product-id="<%= product._id %>">
+                                    <img src="<%= product.image %>" alt="<%= product.name %>">
+                                    <h3><%= product.name %></h3>
+                                    <p class="price">$<%= product.price.toFixed(2) %></p>
+                                    <p class="quantity">Quantity: <%= product.quantity %></p>
+                                    <p class="sold">Sold: <%= product.sold %></p>
+                                    <button class="view-details-btn">View Details</button>
+                                    <button class="seller-edit-btn">Edit</button>
+                                    <button class="seller-delete-btn">Delete</button>
+                                </div>
+                            <% }); %>
+                        </div>
                     </div>
-                </div>
-            <% }); %>
+                <% }); %>
+            <% } %>
         </div>
 
+        <!-- Recent Sales -->
         <div class="seller-recent-sales">
             <h2>Recent Sales</h2>
             <div class="product-list" id="seller-recent-sales">
@@ -96,11 +96,14 @@
                         <p class="quantity">Quantity: <%= product.quantity %></p>
                         <p class="sold">Sold: <%= product.sold %></p>
                         <button class="view-details-btn">View Details</button>
+                        <button class="seller-edit-btn">Edit</button>
+                        <button class="seller-delete-btn">Delete</button>
                     </div>
                 <% }); %>
             </div>
         </div>
 
+        <!-- Top Sales -->
         <div class="seller-top-sales">
             <h2>Top Sales</h2>
             <div class="product-list" id="seller-top-sales">
@@ -112,6 +115,8 @@
                         <p class="quantity">Quantity: <%= product.quantity %></p>
                         <p class="sold">Sold: <%= product.sold %></p>
                         <button class="view-details-btn">View Details</button>
+                        <button class="seller-edit-btn">Edit</button>
+                        <button class="seller-delete-btn">Delete</button>
                     </div>
                 <% }); %>
             </div>
@@ -119,9 +124,9 @@
     </div>
 
     <!-- Product Modal -->
-    <div id="seller-product-modal" class="modal">
-        <div class="modal-content">
-            <span class="seller-close">&times;</span>
+    <div id="seller-product-modal" class="seller-modal">
+        <div class="seller-modal-content">
+            <span class="seller-close">×</span>
             <img id="seller-modal-img" src="" alt="Product Image">
             <h2 id="seller-modal-title"></h2>
             <p id="seller-modal-price"></p>
@@ -131,11 +136,13 @@
         </div>
     </div>
 
-    <div id="seller-overlay" class="overlay"></div>
+    <!-- Overlay -->
+    <div id="seller-overlay" class="seller-overlay"></div>
 
+    <!-- Scripts -->
     <script src="/public/scripts/seller.js"></script>
     <script>
-        // Dark Mode
+        // Dark Mode Toggle
         const themeButton = document.getElementById('theme-button');
         const darkTheme = 'dark-theme';
         const iconTheme = 'ri-sun-line';
@@ -163,14 +170,15 @@
         });
 
         // Mobile Navigation Menu
-        let menu = document.querySelector('#menu');
-        let navbar = document.querySelector('.navbar');
+        const menu = document.querySelector('#menu');
+        const navbar = document.querySelector('.navbar');
 
         menu.onclick = () => {
             menu.classList.toggle('fa-times');
             navbar.classList.toggle('active');
         };
 
+        // Smooth Scrolling for Anchor Links
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
@@ -188,6 +196,7 @@
             });
         });
     </script>
+    <!-- Footer -->
     <footer>
         <%- include('partials/footer.ejs') %>
     </footer>
