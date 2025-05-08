@@ -1,0 +1,319 @@
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Add padding to account for fixed header */
+body {
+    padding-top: 60px;
+}
+
+/* Custom styling for header in seller page */
+header.header {
+    background-color: #fff;
+    padding: 0.5rem 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+/* Style for the Gardenly logo */
+header.header .logo {
+    color: #00e926 !important;
+    font-weight: bold;
+}
+
+header.header .logo i {
+    color: #00e926 !important;
+}
+
+/* Navbar links styling */
+header.header .navbar a {
+    color: #333;
+    text-decoration: none !important;
+    transition: color 0.3s ease-in-out;
+}
+
+/* Hover effect for navbar links */
+header.header .navbar a:hover,
+header.header .navbar a.active {
+    color: #00e926 !important;
+}
+
+/* Seller Container Styles */
+.seller-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.seller-content-container {
+    width: 90%;
+    max-width: 1800px;
+    margin: 0 auto 40px;
+    padding: 0 15px;
+}
+
+/* Form Styles */
+form {
+    padding: 30px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Input and button styles */
+input, button {
+    padding: 15px;
+    font-size: 20px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Full width inputs for form fields */
+#seller-product-form > input {
+    width: 100%;
+    margin: 12px 0;
+}
+
+/* Section Titles */
+h2, .seller-section-title {
+    margin: 30px 0 20px;
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Product Grid */
+.seller-products {
+    padding: 2rem;
+}
+
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card img {
+    width: 100%;
+izzano: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-card h3 {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.product-card p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.product-card button {
+    margin: 0.5rem 0.25rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+}
+
+.product-card button:hover {
+    background: #45a049;
+}
+
+.seller-top-sales,
+.seller-recent-sales {
+    padding: 2rem;
+}
+
+.seller-top-sales h2,
+.seller-recent-sales h2 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* Buttons */
+.view-details-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.view-details-btn:hover {
+    background-color: #219150;
+}
+
+/* Edit Button */
+.seller-edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.seller-edit-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Delete Button */
+.seller-delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.seller-delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Modal Styles */
+.seller-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    max-width: 90%;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.seller-modal.active {
+    display: block;
+}
+
+.seller-modal-content {
+    position: relative;
+}
+
+.seller-modal img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.seller-modal h2 {
+    font-size: 2rem;
+    margin: 15px 0;
+}
+
+.seller-modal p {
+    font-size: 1.3rem;
+    margin: 15px 0;
+    color: #555;
+}
+
+.seller-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 28px;
+    cursor: pointer;
+    color: #777;
+    transition: color 0.3s;
+}
+
+.seller-close:hover {
+    color: #333;
+}
+
+/* Overlay */
+.seller-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.seller-overlay.active {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .product-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .product-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+#seller-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#seller-product-form input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#seller-product-form button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#seller-product-form button:hover {
+    background-color: #45a049;
+}

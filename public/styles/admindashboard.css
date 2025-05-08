@@ -1,0 +1,184 @@
+/* Import base styles from your provided CSS */
+@import url('./homestyle.css');
+
+.admin-container {
+    padding: 3rem 9%;
+    min-height: calc(100vh - var(--header-height));
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--green);
+    color: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 9%;
+    z-index: 1000;
+    box-shadow: var(--box-shadow);
+}
+
+.header .logo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--white);
+}
+
+.header .navbar a {
+    font-size: 1.7rem;
+    margin-left: 2rem;
+    color: var(--white);
+}
+
+.header .navbar a:hover,
+.header .navbar a.active {
+    color: #f0f0f0;
+    border-bottom: 2px solid var(--white);
+}
+
+#menu {
+    font-size: 2.5rem;
+    color: var(--white);
+    cursor: pointer;
+    display: none;
+}
+
+/* Metrics */
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.metric-card {
+    background: var(--container-color);
+    padding: 2rem;
+    border-radius: .5rem;
+    box-shadow: var(--box-shadow);
+    text-align: center;
+}
+
+.metric-card i {
+    font-size: 3rem;
+    color: var(--green);
+    margin-bottom: 1rem;
+}
+
+.metric-card h3 {
+    font-size: 2rem;
+    color: var(--title-color);
+}
+
+.metric-card p {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--green);
+}
+
+/* Table Styling */
+.table-container {
+    overflow-x: auto;
+    margin-top: 3rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--container-color);
+    box-shadow: var(--box-shadow);
+}
+
+th, td {
+    padding: 1.5rem;
+    font-size: 1.6rem;
+    text-align: left;
+    border-bottom: var(--border);
+}
+
+th {
+    background: var(--green);
+    color: var(--white);
+    text-transform: uppercase;
+}
+
+td {
+    color: var(--text-color);
+}
+
+td button {
+    padding: .5rem 1rem;
+    margin-right: .5rem;
+    background: var(--green);
+    color: var(--white);
+    border-radius: .3rem;
+    cursor: pointer;
+}
+
+td button:hover {
+    background: #333;
+}
+
+td button.delete {
+    background: #e63946;
+}
+
+td button.delete:hover {
+    background: #d00000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem 5%;
+    }
+
+    #menu {
+        display: block;
+    }
+
+    .header .navbar {
+        position: absolute;
+        top: 100%;
+        right: -100%;
+        width: 30rem;
+        height: calc(100vh - var(--header-height));
+        background: var(--green);
+        flex-direction: column;
+        padding: 2rem;
+    }
+
+    .header .navbar.active {
+        right: 0;
+    }
+
+    .header .navbar a {
+        margin: 1.5rem 0;
+        font-size: 2rem;
+    }
+
+    .admin-container {
+        padding: 2rem 5%;
+    }
+}
+
+@media (max-width: 450px) {
+    html {
+        font-size: 50%;
+    }
+
+    .metrics-container {
+        grid-template-columns: 1fr;
+    }
+}

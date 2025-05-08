@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gardenly - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/public/styles/admindashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="/" class="logo"><i class="fa-solid fa-leaf"></i> Gardenly Admin</a>
+        <nav class="navbar">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#users">Users</a>
+            <a href="#products">Products</a>
+            <a href="#tickets">Tickets</a>
+            <a href="#orders">Orders</a>
+            <a href="/logout">Logout</a>
+        </nav>
+        <div id="menu" class="fas fa-bars"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-container">
+        <!-- Overview Section -->
+        <section id="overview" class="section active">
+            <h1 class="heading">Admin Dashboard Overview</h1>
+            <div class="line"></div>
+            <div class="metrics-container">
+                <div class="metric-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Total Users</h3>
+                    <p id="total-users">Loading...</p>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-seedling"></i>
+                    <h3>Total Products</h3>
+                    <p id="total-products">Loading...</p>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-ticket-alt"></i>
+                    <h3>Open Tickets</h3>
+                    <p id="open-tickets">Loading...</p>
+                </div>
+                <div class="metric-card">
+                    <i class="fas fa-dollar-sign"></i>
+                    <h3>Total Revenue</h3>
+                    <p id="total-revenue">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users" class="section">
+            <h1 class="heading">Manage Users</h1>
+            <div class="line"></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <h1 class="heading">Manage Products</h1>
+            <div class="line"></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Seller</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tickets Section -->
+        <section id="tickets" class="section">
+            <h1 class="heading">Manage Tickets</h1>
+            <div class="line"></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Requester</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Expert</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tickets-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="section">
+            <h1 class="heading">Manage Orders</h1>
+            <div class="line"></div>
+            <!-- <button onclick="createOrder()" class="create-button">Create New Order</button> -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/public/scripts/admindashboard.js"></script>
+</body>
+</html>
