@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -20,11 +21,12 @@ app.use(express.static(path.join(__dirname, '/')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'your_secret_key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: false } // Set to true if using HTTPS in production
 }));
+
 
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
