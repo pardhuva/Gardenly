@@ -22,12 +22,19 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, '/')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const MongoStore = require('connect-mongo');
+
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS in production
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
+  cookie: {
+    secure: false, // Set to true when using HTTPS
+    maxAge: 1000 * 60 * 60 * 24 // Optional: 1 day session expiration
+  }
 }));
+
 
 
 // Authentication middleware
