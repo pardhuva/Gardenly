@@ -1,4 +1,6 @@
 require('dotenv').config();
+require('./database'); // This will run the DB connection logic
+
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
