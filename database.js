@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Connect to MongoDB with better error handling and increased timeout
-mongoose.connect('mongodb://127.0.0.1:27017/gardenly', {
+mongoose.connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 30000, // 30 seconds timeout
     bufferCommands: false // Disable command buffering
 })
