@@ -1252,6 +1252,7 @@ app.get('/api/top-sales', isAuthenticated, isSeller, async (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 7000;
+const HOST = '0.0.0.0'; // listen on all network interfaces
 initializeDatabase()
     .then(() => {
         app.listen(PORT, () => {
