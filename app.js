@@ -1255,7 +1255,7 @@ const PORT = process.env.PORT || 7000;
 const HOST = '0.0.0.0'; // listen on all network interfaces
 initializeDatabase()
     .then(() => {
-        app.listen(PORT, () => {
+        app.listen(PORT, HOST, () => {
             console.log(`Server running on http://localhost:${PORT}`);
         });
     })
