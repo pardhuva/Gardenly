@@ -1,16 +1,20 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables from .env
+
+// Get MongoDB URI from .env or fallback
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gardenly';
 
 // Connect to MongoDB with better error handling and increased timeout
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(mongoURI, {
     serverSelectionTimeoutMS: 30000, // 30 seconds timeout
     bufferCommands: false // Disable command buffering
 })
 .then(() => {
-    console.log('Successfully connected to MongoDB');
+    console.log('✅ Successfully connected to MongoDB');
 })
 .catch(err => {
-    console.error('MongoDB connection error:', err.message);
+    console.error('❌ MongoDB connection error:', err.message);
     process.exit(1); // Exit if we can't connect to the database
 });
 

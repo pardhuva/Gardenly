@@ -20,21 +20,33 @@
                 <div class="swiper-slide">
                     <div class="box" style="background:url(../public/images/homeslider/h1.png);">
                         <div class="content">
-                            <a href="#available" class="btn">Shop Now</a>
+                            <% if (user && (user.role === 'Seller')) { %>
+                                <a href="#" class="btn" style="pointer-events:none;opacity:0.6;" title="You cannot shop">Shop Now</a>
+                            <% } else { %>
+                                <a href="#available" class="btn">Shop Now</a>
+                            <% } %>
                         </div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="box" style="background:url(../public/images/homeslider/h2.png);">
                         <div class="content">
-                            <a href="#available" class="btn">Shop Now</a>
+                              <% if (user && (user.role === 'Seller')) { %>
+                                    <a href="#" class="btn" style="pointer-events:none;opacity:0.6;" title="You cannot shop">Shop Now</a>
+                                <% } else { %>
+                                    <a href="#available" class="btn">Shop Now</a>
+                                <% } %>
                         </div>
                     </div>
                 </div>
                 <div class="swiper-slide">
                     <div class="box" style="background:url(../public/images/homeslider/h3.png);">
                         <div class="content">
-                            <a href="#available" class="btn">Shop Now</a>
+                            <% if (user && (user.role === 'Seller')) { %>
+                                <a href="#" class="btn" style="pointer-events:none;opacity:0.6;" title="You cannot shop">Shop Now</a>
+                            <% } else { %>
+                                <a href="#available" class="btn">Shop Now</a>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -109,7 +121,15 @@
                     <div class="available">
                         <span>Available: <%= product.available %></span>
                     </div>
-                    <a href="#" class="btn add-to-cart-btn"><%= product.inStock ? 'Add to Cart' : 'Out of Stock' %></a>
+
+                    <% if (user && user.role === 'Buyer') { %>
+                        <a href="#" class="btn add-to-cart-btn"><%= product.inStock ? 'Add to Cart' : 'Out of Stock' %></a>
+                    <% } else if (user && (user.role === 'Seller')) { %>
+                        <a href="#" class="btn add-to-cart-btn" style="pointer-events:none;opacity:0.6;" title="Sellers cannot buy products" disabled>Add to Cart</a>
+                    <% } else { %>
+                        <a href="/login" class="btn add-to-cart-btn">Add to Cart</a>
+                    <% } %>
+
                 </div>
             <% }) %>
         </div>
